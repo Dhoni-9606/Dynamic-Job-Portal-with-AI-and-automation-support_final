@@ -1,10 +1,9 @@
 import axios from "axios";
 
 const api = axios.create({
-  // Deployed Django API: https://job-portal-production-1bb1.up.railway.app/api
   baseURL:
     import.meta.env.VITE_API_BASE_URL ||
-    "https://dynamic-job-portal-with-ai-and.onrender.com",
+    "https://dynamic-job-portal-with-ai-and.onrender.com/api",
 
 });
 

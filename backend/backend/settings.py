@@ -23,7 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 def env_list(name, default=""):
-    return [item.strip() for item in os.getenv(name, default).split(",") if item.strip()]
+    value = os.getenv(name)
+    if value is None:
+        value = default
+    if isinstance(value, str):
+        value = value.split(",")
+    return [item.strip() for item in value if item and item.strip()]
 
 
 def env_bool(name, default=False):
@@ -41,7 +46,7 @@ def env_int(name, default=0):
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env_bool("DEBUG", default=True)
+DEBUG = env_bool("DEBUG", default=False)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv(
@@ -50,22 +55,11 @@ SECRET_KEY = os.getenv(
 )
 
 
-ALLOWED_HOSTS = [
+ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", [
     "localhost",
     "127.0.0.1",
     "dynamic-job-portal-with-ai-and.onrender.com",
-]
-
-if os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("RAILWAY_ENVIRONMENT_NAME"):
-    railway_healthcheck_hosts = [
-        "localhost",
-        "127.0.0.1",
-        "[::1]",
-        ".railway.app",
-        ".up.railway.app",
-        ".railway.internal",
-    ]
-    ALLOWED_HOSTS = list(dict.fromkeys([*ALLOWED_HOSTS, *railway_healthcheck_hosts]))
+])
 
 
 # Application definition
@@ -103,31 +97,22 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'backend.urls'
-# CORS_ALLOWED_ORIGINS = env_list(
-#     "CORS_ALLOWED_ORIGINS",
-#     "http://localhost:5173,http://127.0.0.1:5173,https://dynamic-job-portal.vercel.app,https://frontend-job-portal-six.vercel.app",
-# )
-
 CORS_ALLOWED_ORIGINS = env_list(
     "CORS_ALLOWED_ORIGINS",
-    default=[
+    [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "https://dynamic-job-portal-with-ai-and-auto.vercel.app",
-    ]
+    ],
 )
 
 CORS_ALLOW_ALL_ORIGINS = env_bool("CORS_ALLOW_ALL_ORIGINS", default=False)
-# CSRF_TRUSTED_ORIGINS = env_list(
-#     "CSRF_TRUSTED_ORIGINS",
-#     # "https://*.railway.app,https://*.up.railway.app",
-# )
 CSRF_TRUSTED_ORIGINS = env_list(
     "CSRF_TRUSTED_ORIGINS",
-    default=[
+    [
         "https://dynamic-job-portal-with-ai-and-auto.vercel.app",
         "https://dynamic-job-portal-with-ai-and.onrender.com",
-    ]
+    ],
 )
 
 TEMPLATES = [
@@ -165,6 +150,8 @@ if DATABASE_URL:
         conn_max_age=600,
         conn_health_checks=True,
     )
+elif not DEBUG:
+    raise RuntimeError("DATABASE_URL must be set when DEBUG is disabled.")
 
 
 # Password validation
@@ -232,7 +219,7 @@ EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", default=True)
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "").strip()
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "").strip()
 if EMAIL_HOST.lower().endswith("gmail.com"):
-    # Gmail displays app passwords in groups; Railway users often paste those spaces too.
+    # Gmail displays app passwords in groups; remove pasted spaces before connecting.
     EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD.replace(" ", "")
 EMAIL_BACKEND = os.getenv(
     "EMAIL_BACKEND",

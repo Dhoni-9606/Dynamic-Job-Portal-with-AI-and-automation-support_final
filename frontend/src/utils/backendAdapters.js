@@ -38,7 +38,7 @@ export const getMediaUrl = (path) => {
 
   const apiBase =
     import.meta.env.VITE_API_BASE_URL ||
-    "https://job-portal-production-1bb1.up.railway.app/api";
+    "https://dynamic-job-portal-with-ai-and.onrender.com/api";
   const backendOrigin = apiBase.replace(/\/api\/?$/, "");
   return `${backendOrigin}${String(value).startsWith("/") ? value : `/${value}`}`;
 };

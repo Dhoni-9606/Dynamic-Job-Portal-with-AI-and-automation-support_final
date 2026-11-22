@@ -35,7 +35,7 @@ class ForgotPasswordView(generics.GenericAPIView):
         except (BadHeaderError, SMTPException, OSError) as exc:
             logger.exception("Password reset OTP email failed")
             return Response(
-                {'message': 'Could not send OTP email. Please check email configuration and Railway logs.'},
+                {'message': 'Could not send OTP email. Please check email configuration and backend logs.'},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
         return Response({'message': 'OTP sent to your email.'}, status=200)

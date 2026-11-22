@@ -31,7 +31,7 @@ Install Command: npm install
 Required environment variable:
 
 ```text
-VITE_API_BASE_URL=https://your-railway-backend-domain.up.railway.app/api
+VITE_API_BASE_URL=https://dynamic-job-portal-with-ai-and.onrender.com/api
 ```
 
 Optional environment variables for external job search:
