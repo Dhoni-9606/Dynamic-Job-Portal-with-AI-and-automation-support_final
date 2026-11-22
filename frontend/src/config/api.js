@@ -4,8 +4,7 @@ const api = axios.create({
   // Deployed Django API: https://job-portal-production-1bb1.up.railway.app/api
   baseURL:
     import.meta.env.VITE_API_BASE_URL ||
-    // "https://job-portal-production-1bb1.up.railway.app/api",
-    "http://127.0.0.1:8000/api"
+    "https://dynamic-job-portal-with-ai-and.onrender.com",
 });
 
 api.interceptors.request.use((config) => {
