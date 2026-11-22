@@ -49,10 +49,11 @@ SECRET_KEY = os.getenv(
     "django-insecure-!*((u03!*j+0p95+*ibt(5z3vh-r^vacnf(823_2w81vt_8kha" if DEBUG else "",
 )
 
-ALLOWED_HOSTS = env_list(
-    "ALLOWED_HOSTS",
-    "localhost,127.0.0.1,testserver,.railway.app,.up.railway.app",
-)
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "dynamic-job-portal-with-ai-and.onrender.com",
+]
 
 if os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("RAILWAY_ENVIRONMENT_NAME"):
     railway_healthcheck_hosts = [
@@ -103,12 +104,19 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'backend.urls'
 CORS_ALLOWED_ORIGINS = env_list(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:5173,http://127.0.0.1:5173,https://dynamic-job-portal.vercel.app,https://frontend-job-portal-six.vercel.app",
+    default=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://dynamic-job-portal-with-ai-and-auto.vercel.app",
+    ]
 )
 CORS_ALLOW_ALL_ORIGINS = env_bool("CORS_ALLOW_ALL_ORIGINS", default=False)
 CSRF_TRUSTED_ORIGINS = env_list(
     "CSRF_TRUSTED_ORIGINS",
-    # "https://*.railway.app,https://*.up.railway.app",
+    default=[
+        "https://dynamic-job-portal-with-ai-and-auto.vercel.app",
+        "https://dynamic-job-portal-with-ai-and.onrender.com",
+    ]
 )
 
 TEMPLATES = [
