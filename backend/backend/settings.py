@@ -49,10 +49,7 @@ SECRET_KEY = os.getenv(
     "django-insecure-!*((u03!*j+0p95+*ibt(5z3vh-r^vacnf(823_2w81vt_8kha" if DEBUG else "",
 )
 
-# ALLOWED_HOSTS = env_list(
-#     "ALLOWED_HOSTS",
-#     "localhost,127.0.0.1,testserver,.railway.app,.up.railway.app",
-# )
+
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
