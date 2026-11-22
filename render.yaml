@@ -6,12 +6,13 @@ databases:
 
 services:
   - type: web
-    name: dynamic-job-portal-api
+    name: dynamic-job-portal-with-ai-and
     runtime: python
     plan: starter
-    buildCommand: pip install -r requirements.txt && python backend/manage.py collectstatic --noinput
-    preDeployCommand: python backend/manage.py migrate
-    startCommand: gunicorn --chdir backend backend.wsgi:application --bind 0.0.0.0:$PORT --access-logfile - --error-logfile - --timeout 120
+    rootDir: backend
+    buildCommand: python -m pip install -r requirements.txt && python manage.py collectstatic --noinput
+    preDeployCommand: python manage.py migrate --noinput
+    startCommand: gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT --access-logfile - --error-logfile - --timeout 120
     healthCheckPath: /health/
     envVars:
       - key: DEBUG

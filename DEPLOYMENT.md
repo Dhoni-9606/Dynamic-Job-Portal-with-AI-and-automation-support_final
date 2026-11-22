@@ -2,7 +2,9 @@
 
 ## Render backend
 
-The root `render.yaml` defines the Django web service and its PostgreSQL database. In Render, create a Blueprint from this repository and deploy it. The Blueprint installs `requirements.txt`, collects static files, applies migrations before each deploy, and starts Gunicorn. Its health check uses `/health/`.
+The root `render.yaml` defines the Django web service and its PostgreSQL database. In Render, create or sync a Blueprint from this repository and deploy it. The backend service root is `backend`, so dependency installation uses `backend/requirements.txt`; it collects static files, applies migrations before each deploy, and starts Gunicorn from the Django project directory. Its health check uses `/health/`.
+
+If you keep a manually created Render service instead of syncing the Blueprint, set its Root Directory to `backend`, Build Command to `./build.sh`, Pre-Deploy Command to `python manage.py migrate --noinput`, Start Command to `gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT --access-logfile - --error-logfile - --timeout 120`, and Health Check Path to `/health/`. Ensure that service has `DEBUG=False`, a generated `SECRET_KEY`, and a Render PostgreSQL `DATABASE_URL`.
 
 The Blueprint generates `SECRET_KEY` and connects `DATABASE_URL` to the provisioned Render PostgreSQL database. It configures the Render API hostname and the Vercel frontend origin for allowed hosts, CORS, and CSRF. Email delivery is optional; set `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, and `DEFAULT_FROM_EMAIL` in the Render service environment to enable SMTP.
 

@@ -60,6 +60,9 @@ ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", [
     "127.0.0.1",
     "dynamic-job-portal-with-ai-and.onrender.com",
 ])
+render_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME")
+if render_hostname and render_hostname not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_hostname)
 
 
 # Application definition
