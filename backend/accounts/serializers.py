@@ -2,6 +2,7 @@ import random
 import string
 
 import dns.resolver
+import logging
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
@@ -12,14 +13,34 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 def is_real_email_domain(email):
     domain = email.split('@')[-1]
     try:
-        dns.resolver.resolve(domain, 'MX')
-        return True
-    except:
+        resolver = dns.resolver.Resolver()
+        # DNS can be slow or unavailable in a hosted environment. Keep signup
+        # responsive and treat resolver failures as an invalid/unverified domain.
+        resolver.timeout = 2
+        resolver.lifetime = 3
+        answers = resolver.resolve(domain, 'MX')
+        return bool(answers)
+    except dns.resolver.NXDOMAIN:
+        return False
+    except dns.resolver.NoAnswer:
+        return False
+    except dns.resolver.NoNameservers:
+        logger.warning("Could not verify MX records for email domain %s: no nameservers", domain)
+        return False
+    except dns.exception.Timeout:
+        logger.warning("Could not verify MX records for email domain %s: DNS lookup timed out", domain)
+        return False
+    except dns.exception.DNSException:
+        logger.exception("Could not verify MX records for email domain %s", domain)
+        return False
+    except OSError:
+        logger.exception("Could not verify MX records for email domain %s", domain)
         return False
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
